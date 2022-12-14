@@ -1,0 +1,112 @@
+#!/bin/bash
+
+#Se guarda la version del script
+version="1.0.0"
+
+#Show to the user the information of the script
+help(){
+	echo "
+		NAME
+			docli - manage docker-compose stacks centrally
+		SYNOPSYS
+			docli [OPTION] ... [DIRECTORY] ...
+		DESCRIPTION
+			Manage multiple docker-compose stacks with a single command.
+			--all apply the command to all groups in the inventory
+			--context[=CTX] inventory group to apply the command
+			--help display this help message and exit
+			--version output version information and exit
+			 The OPTIONS supported include:
+				Create: Creates a new empty directory. Must be followed by
+				the --context flag. The directory name will be the one
+				passed within the context. E.g.:
+				docli create --context=stack_1
+				
+				Up: Passes the \"docker-compose up -d\" command to the
+				specified context. Can be used with --context or --all.
+				docli up --context=stack_1
+				
+				Down: Passes the \"docker-compose down -d\" command to the
+				specified context. Can be used with --context or --all.
+				docli down --all
+	"
+}
+
+#Show the script's version to the user
+version(){
+	echo "version: $version"
+}
+#Check if have --context= and if all ok
+#Create a directory
+#@arg = $2
+create(){
+	case $1 in 
+		--context=*)
+			mkdir "${1##*=}"
+			;;
+		*)
+			echo "--context=[] expected"
+			;;
+	esac
+}
+
+#Check if pass -all or a lone directory and call statement_up_down
+#In -all get all the directories
+#arg=$1
+#arg=$2
+context_op(){
+	if [ "$2" == "--all" ];
+	then
+		list="$(ls -d */ | grep -F stack_)"
+		for i in ${list[@]}
+		do
+			statement_up_down $1 $i
+		done	
+	else
+		i="${2##*=}"
+		statement_up_down $1 $i
+	fi
+}
+#Check if is up or down and run the correct command
+#arg=$1 <-- up or down
+#arg=i <-- the directory name
+statement_up_down(){
+	if [ "$1" == "up" ]
+	then
+		cd $i
+		docker-compose up
+		cd ..
+	else
+		cd $i
+		docker-compose down
+		cd ..
+	fi
+}
+
+#################################################
+########### THE MAIN ############################
+#################################################
+
+case $1 in
+	--prueba)
+		prueba
+		;;
+	--help)
+		help
+		;;
+	--version)
+		version
+		;;
+	create)
+		create $2
+		;;
+	up)
+		context_op $1 $2
+		;;
+	down) 
+		context_op $1 $2
+		;;
+	*)
+		echo "ERROR TRY WITH: docli [OPTION] ... [DIRECTORY] ..."
+		;;
+esac

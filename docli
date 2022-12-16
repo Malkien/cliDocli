@@ -42,14 +42,23 @@ version(){
 create(){
 	case $1 in 
 		--context=*)
-			mkdir "${1##*=}"
+			if [[ "${1##*=}" == "stack_"* && "${1##*_}" =~ ^[0-9]+$ ]]
+			then
+				if ! [ -d ${1##*=} ]
+				then 
+					mkdir "${1##*=}"
+				else
+					echo "There is a directory with this name already"
+				fi
+			else
+				echo "Format not correct try: stack_N"
+			fi
 			;;
 		*)
 			echo "--context=[] expected"
 			;;
 	esac
 }
-
 #Check if pass -all or a lone directory and call statement_up_down
 #In -all get all the directories
 #arg=$1
@@ -60,13 +69,34 @@ context_op(){
 		list="$(ls -d */ | grep -F stack_)"
 		for i in ${list[@]}
 		do
-			statement_up_down $1 $i
+			check_compose $1 $i
 		done	
-	else
+	elif [[ ${2:0:10} == "--context=" ]]
+	then
 		i="${2##*=}"
-		statement_up_down $1 $i
+		if [[ "${i:0:6}" == "stack_" && "${i:6}" =~ ^[0-9]+$ ]]
+		then
+			check_compose $1 $i
+		else
+			echo "format error try: --context=stack_N"
+		fi
+	else
+		echo "format error try: --context=[]"
 	fi
 }
+
+#Check if the directory have a dockercompose
+#@arg1=$i
+check_compose(){
+	if [ -f $1/docker_compose.yml ]
+	then 
+		statement_up_down $1 $i
+	else
+		echo "The directory: $i doesn't have docker_compose"
+	fi
+	
+}
+
 #Check if is up or down and run the correct command
 #arg=$1 <-- up or down
 #arg=i <-- the directory name
@@ -74,11 +104,21 @@ statement_up_down(){
 	if [ "$1" == "up" ]
 	then
 		cd $i
-		docker-compose up
+		{
+			docker-compose up
+		}||
+		{
+			echo "Fallo en docker compose"
+		}
 		cd ..
 	else
 		cd $i
-		docker-compose down
+		{
+			docker-compose down
+		}||
+		{
+			echo "Fallo en docker compose"
+		}
 		cd ..
 	fi
 }

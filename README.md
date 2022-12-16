@@ -25,12 +25,12 @@ Warning: when you run the script remmember that it take as directory you're in, 
 ## Analysis
 ### Tecnologies
 This script require:
-    * Bash(saved in /bin/bash).
-    * mkdir.
-    * ls.
-    * grep.
-    * echo.
-    * docker-compose.
+ - Bash(saved in /bin/bash).
+ - mkdir.
+ - ls.
+ - grep.
+ - echo.
+ - docker-compose.
 
 ### Utilities it should have
     1. The script work in a workplace with directories that have the the format stack_N and inside a docker compose, to it have a json named inventary which save the name of the directory and the services the docker compose has. But the json is not implemented now and will be done in future versions.

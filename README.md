@@ -25,7 +25,7 @@ Warning: when you run the script remmember that it take as directory you're in, 
 ## Analysis
 ### Tecnologies
 This script require:
-    * Shell script <-- saved in /bin/bash.
+    * Bash(saved in /bin/bash).
     * mkdir.
     * ls.
     * grep.

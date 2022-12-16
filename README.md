@@ -11,20 +11,41 @@ Warning: when you run the script remmember that it take as directory you're in, 
 
 ## Table of contents
 - [Analysis](#analisys)
+    * [Tecnologies](#tecnologies)
+    * [Utilities](#utilities-it-should-have)
 - [Desing](#desing)
+    * [Main](#1-the-main-of-the-script)
+    * [Help](#2-the-help-function-that-display-the-utilities-of-the-script)
+    * [Version](#3-the-version-function-that-display-the-version)
+    * [Create](#4-the-create-function-that-create-the-repository)
+    * [Up-Down](#5-the-funtion-context_op)
 - [Credits](#credits)
 
+
 ## Analysis
-    1. The script have to display a help option that show the information about itslef with the command `--help`.
-    2. The script have to have a version of itself and show it woth the command `--version`.
-    3. The script have to create a directory only if you pass a context to in.
-    4. The script have to boot the docker compose in 1 or all the directories with the correct format, in this case stack_* <-- Numeric.
+### Tecnologies
+This script require:
+    * Shell script <-- saved in /bin/bash.
+    * mkdir.
+    * ls.
+    * grep.
+    * echo.
+    * docker-compose.
+
+### Utilities it should have
+    1. The script work in a workplace with directories that have the the format stack_N and inside a docker compose, to it have a json named inventary which save the name of the directory and the services the docker compose has. But the json is not implemented now and will be done in future versions.
+    2. The script have to display a help option that show the information about itslef with the command `--help`.
+    3. The script have to have a version of itself and show it woth the command `--version`.
+    4. The script have to create a directory only if you pass a context to in. In a future version save it in inventary.
+    5. The script have to boot the docker compose in 1 or all the directories with the correct format, in this case stack_* <-- Numeric.
         * If it's only one pass `--context=name`.
         * If it's all pass `--all`.
-    5. The script have to shut down the docker-compose in 1 or all the directories with the same option that the boot have.
+    6. The script have to shut down the docker-compose in 1 or all the directories with the same option that the boot have.
+    7. Is expected a utility that read and save the services every directory has in the inventary.
 
 ## Design
-### 1. Create the main of the script.
+### 1. The main of the script.
+This is the main of the script and hadle the first option given.
 ```shell
 {
     case $1 in
@@ -52,7 +73,8 @@ Warning: when you run the script remmember that it take as directory you're in, 
     esac
 } 
 ```
-### 2. Create the help function that display the utilities of the script.
+### 2. The help function that display the utilities of the script.
+This only display the descripption and way to use the script.
 ```shell
 {
     help(){
@@ -84,7 +106,7 @@ Warning: when you run the script remmember that it take as directory you're in, 
     }
 }
 ```
-### 3. Create the version function that display the version
+### 3. The version function that display the version
 For this with create a variable in the script that save the version the script is using and is you improve it in the future you only have to change this variable and dont search for where it is used.
 ```shell
 {
@@ -95,7 +117,8 @@ For this with create a variable in the script that save the version the script i
 }
 ```
 
-### 4. Create the create function that create the repository
+### 4. The create function that create the repository
+This function check the context given and search if the directory already exist and check if the format given is correct. if there isn't a directory with the same name and the format is correct it create thank to mkdir the directory.
 ```shell
 {
     #Check if have --context= and if all ok
@@ -104,8 +127,17 @@ For this with create a variable in the script that save the version the script i
     create(){
         case $1 in 
             --context=*)
-                #this take a substring of all after the =
-                mkdir "${1##*=}"
+                if [[ "${1##*=}" == "stack_"* && "${1##*_}" =~ ^[0-9]+$ ]]
+                then
+                    if ! [ -d ${1##*=} ]
+                    then 
+                        mkdir "${1##*=}"
+                    else
+                        echo "There is a directory with this name already"
+                    fi
+                else
+                    echo "Format not correct try: stack_N"
+                fi
                 ;;
             *)
                 echo "--context=[] expected"
@@ -115,9 +147,10 @@ For this with create a variable in the script that save the version the script i
 }
 ```
 
-### 5. Create the funtion context_op
-Because the 2 lost funtion operate of the same way better than write 2 time the same thing we create is.
-
+### 5. The funtion context_op
+This function check if the second option given is all or a single directory.
+    * If is all, it take all the directories in or path that have the format "stack_" and start to iterate loading the function check_compose.
+    * If is a single directory it check if the format given is correct and late load the function check_compose
 This function use the function in the 6.
 
 ```shell
@@ -129,22 +162,47 @@ This function use the function in the 6.
     context_op(){
         if [ "$2" == "--all" ];
         then
-            #list all the repositories and save only the ones that start for stack_
             list="$(ls -d */ | grep -F stack_)"
             for i in ${list[@]}
             do
-                statement_up_down $1 $i
+                check_compose $1 $i
             done	
-        else
+        elif [[ ${2:0:10} == "--context=" ]]
+        then
             i="${2##*=}"
-            statement_up_down $1 $i
+            if [[ "${i:0:6}" == "stack_" && "${i:6}" =~ ^[0-9]+$ ]]
+            then
+                check_compose $1 $i
+            else
+                echo "format error try: --context=stack_N"
+            fi
+        else
+            echo "format error try: --context=[]"
         fi
     }
 }
 ```
+### 6. The function check_compose
+This function check if inside the directory given there is a docker_compose if exist it load the function statement_up_down
 
-### 6. Create the funtion statement_up_down
-This funstion compare if arg 1 is up or down and go inside the directory in arg i execute the up or down and go back to the directory we run the script.
+```shell
+{
+    #Check if the directory have a dockercompose
+    #@arg1=$i
+    check_compose(){
+        if [ -f $1/docker_compose.yml ]
+        then 
+            statement_up_down $1 $i
+        else
+            echo "The directory: $i doesn't have docker_compose"
+        fi
+        
+    }
+}
+```
+
+### 7. The funtion statement_up_down
+This function check if arg 1 is up or down, go inside the directory in arg i, execute the up or down and go back to the directory we run the script.
 ```shell
 {
     #Check if is up or down and run the correct command
@@ -154,11 +212,21 @@ This funstion compare if arg 1 is up or down and go inside the directory in arg 
         if [ "$1" == "up" ]
         then
             cd $i
-            docker-compose up
+            {
+                docker-compose up
+            }||
+            {
+                echo "Fallo en docker compose"
+            }
             cd ..
         else
             cd $i
-            docker-compose down
+            {
+                docker-compose down
+            }||
+            {
+                echo "Fallo en docker compose"
+            }
             cd ..
         fi
     }

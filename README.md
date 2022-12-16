@@ -13,6 +13,7 @@ Warning: when you run the script remmember that it take as directory you're in, 
 - [Analysis](#analisys)
     * [Tecnologies](#tecnologies)
     * [Utilities](#utilities-it-should-have)
+    * [Diagram](#diagram)
 - [Desing](#desing)
     * [Main](#1-the-main-of-the-script)
     * [Help](#2-the-help-function-that-display-the-utilities-of-the-script)
@@ -42,6 +43,8 @@ This script require:
         * If it's all pass `--all`.
     6. The script have to shut down the docker-compose in 1 or all the directories with the same option that the boot have.
     7. Is expected a utility that read and save the services every directory has in the inventary.
+### Diagram
+	![alt text](Untitled Diagram.drawio.png "Diagram of the script")
 
 ## Design
 ### 1. The main of the script.

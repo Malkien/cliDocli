@@ -34,9 +34,9 @@ This script require:
  - docker-compose.
 
 ### Utilities it should have
-    1. The script work in a workplace with directories that have the the format stack_N and inside a docker compose, to it have a json named inventary which save the name of the directory and the services the docker compose has. But the json is not implemented now and will be done in future versions.
-    2. The script have to display a help option that show the information about itslef with the command `--help`.
-    3. The script have to have a version of itself and show it woth the command `--version`.
+    1. The script work in a workplace with directories that have the format stack_N and inside a docker compose, to it have a json named inventary which save the name of the directory and the services the docker compose has. But the json is not implemented now and will be done in future versions.
+    2. The script have to display a help option that show the information about itself with the command `--help`.
+    3. The script have to have a version of itself and show it with the command `--version`.
     4. The script have to create a directory only if you pass a context to in. In a future version save it in inventary.
     5. The script have to boot the docker compose in 1 or all the directories with the correct format, in this case stack_* <-- Numeric.
         * If it's only one pass `--context=name`.
@@ -52,9 +52,6 @@ This is the main of the script and hadle the first option given.
 ```shell
 {
     case $1 in
-        --prueba)
-            prueba
-            ;;
         --help)
             help
             ;;
@@ -77,7 +74,7 @@ This is the main of the script and hadle the first option given.
 } 
 ```
 ### 2. The help function that display the utilities of the script.
-This only display the descripption and way to use the script.
+This only display the description and way to use the script.
 ```shell
 {
     help(){
@@ -110,7 +107,7 @@ This only display the descripption and way to use the script.
 }
 ```
 ### 3. The version function that display the version
-For this with create a variable in the script that save the version the script is using and is you improve it in the future you only have to change this variable and dont search for where it is used.
+For this we create a variable in the script that save the version the script is using and if you improve it in the future you only have to change this variable and dont search for where it is used.
 ```shell
 {
     version="1.0.0"
@@ -121,7 +118,7 @@ For this with create a variable in the script that save the version the script i
 ```
 
 ### 4. The create function that create the repository
-This function check the context given and search if the directory already exist and check if the format given is correct. if there isn't a directory with the same name and the format is correct it create thank to mkdir the directory.
+This function check the context given and search if the directory already exist and check if the format given is correct. if there isn't a directory with the same name and the format is correct it create the directory thank to mkdir.
 ```shell
 {
     #Check if have --context= and if all ok
@@ -186,7 +183,7 @@ This function use the function in the 6.
 }
 ```
 ### 6. The function check_compose
-This function check if inside the directory given there is a docker_compose if exist it load the function statement_up_down
+This function check if inside the directory given there is a docker_compose. If exist, it load the function statement_up_down
 
 ```shell
 {

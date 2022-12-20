@@ -89,17 +89,22 @@ context_op(){
 check_compose(){
 	for i in ${list[@]}
 	do
-		cd $i
-		if [[ $(find . -name 'docker-compose.yml' | wc -l) -gt 0 ]]
-		then
-			{
-				docker-compose $1 -d
-			}|| echo "Error with the docker-compose"
-		else
-			echo "The directory: $i doesn't have docker-compose"
-		fi
+		if [ -d $i ]
+		then 
+			cd $i
+			if [[ $(find . -name 'docker-compose.yml' | wc -l) -gt 0 ]]
+			then
+				{
+					docker-compose $1 -d
+				}|| echo "Error with the docker-compose"
+			else
+				echo "The directory: $i doesn't have docker-compose"
+			fi
 
-		cd .. 
+			cd ..
+		else 
+			echo "The directory $i doesn't exist"
+		fi
 	done
 	
 }

@@ -1,0 +1,18 @@
+version: "3.5"
+services:
+  web-server:
+    image: web/web-server:latest
+    container_name: web-container
+    build:
+      context: ./web
+      args:
+        - APP_NAME:web
+        - APP_VERSION:0.0.1-SNAPSHOT
+    environment:
+        SPRING_PROFILES_ACTIVE: dev
+    expose:
+        - 8080
+    ports:
+        - 8000:8080
+
+

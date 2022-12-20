@@ -2,18 +2,17 @@
 
 ## DESCRIPTION
 This repository contain a bash script that administrate a workplay of Docker compose. And the diferent utilities of the script are:
-    * Create a new empty directory.
-    * Run one or all the docker-compose in the workplace.
-    * Shut down one or all the docker-compose in the workplace.
-    * Display the version.
-    * Display the script's information.
+* Create a new empty directory.
+* Run one group or all the docker-compose in the workplace.
+* Shut down one or all the docker-compose in the workplace.
+* Display the version.
+* Display the script's information.
 Warning: when you run the script remmember that it take as directory you're in, or you can modify it to uso a specify absolute path(but it is you to modify it).
 
 ## Table of contents
 - [Analysis](#analisys)
     * [Tecnologies](#tecnologies)
     * [Utilities](#utilities-it-should-have)
-    * [Diagram](#diagram)
 - [Desing](#desing)
     * [Main](#1-the-main-of-the-script)
     * [Help](#2-the-help-function-that-display-the-utilities-of-the-script)
@@ -26,12 +25,14 @@ Warning: when you run the script remmember that it take as directory you're in, 
 ## Analysis
 ### Tecnologies
 This script require:
- - Bash(saved in /bin/bash).
- - mkdir.
- - ls.
- - grep.
- - echo.
- - docker-compose.
+* Shell script <-- saved in /bin/bash.
+* mkdir.
+* ls.
+* grep.
+* find.
+* awk.
+* echo.
+* docker-compose.
 
 ### Utilities it should have
     1. The script work in a workplace with directories that have the the format stack_N and inside a docker compose, to it have a json named inventary which save the name of the directory and the services the docker compose has. But the json is not implemented now and will be done in future versions.
@@ -39,12 +40,10 @@ This script require:
     3. The script have to have a version of itself and show it woth the command `--version`.
     4. The script have to create a directory only if you pass a context to in. In a future version save it in inventary.
     5. The script have to boot the docker compose in 1 or all the directories with the correct format, in this case stack_* <-- Numeric.
-        * If it's only one pass `--context=name`.
+        * If it's only one pass `--context=group`.
         * If it's all pass `--all`.
     6. The script have to shut down the docker-compose in 1 or all the directories with the same option that the boot have.
     7. Is expected a utility that read and save the services every directory has in the inventary.
-### Diagram
-![Diagram image](Untitled Diagram.drawio.png?raw=true "Diagram of the script")
 
 ## Design
 ### 1. The main of the script.
@@ -52,9 +51,6 @@ This is the main of the script and hadle the first option given.
 ```shell
 {
     case $1 in
-        --prueba)
-            prueba
-            ;;
         --help)
             help
             ;;
@@ -237,4 +233,4 @@ This function check if arg 1 is up or down, go inside the directory in arg i, ex
 ```
 
 ## Credits
-Made by me Malkien ^^
+Made by me Malkien ^^ 

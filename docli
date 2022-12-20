@@ -59,7 +59,7 @@ create(){
 			;;
 	esac
 }
-#Check if pass -all or a lone directory and call statement_up_down
+#Check if pass -all or a group of the directories and call check_compose
 #In -all get all the directories
 #arg=$1
 #arg=$2
@@ -67,60 +67,41 @@ context_op(){
 	if [ "$2" == "--all" ];
 	then
 		list="$(ls -d */ | grep -F stack_)"
-		for i in ${list[@]}
-		do
-			check_compose $1 $i
-		done	
+		check_compose $1 $list
 	elif [[ ${2:0:10} == "--context=" ]]
 	then
-		i="${2##*=}"
-		if [[ "${i:0:6}" == "stack_" && "${i:6}" =~ ^[0-9]+$ ]]
+		group="${2##*=}"
+		list=($( awk "/\[$group\]/{flag=1; next} /\[/{flag=0} flag" inventary ))
+		if [ ${#list[@]} != 0 ]
 		then
-			check_compose $1 $i
+			check_compose $1 $list
 		else
-			echo "format error try: --context=stack_N"
+			echo "The group [$group] don't exist"
 		fi
 	else
 		echo "format error try: --context=[]"
 	fi
 }
 
-#Check if the directory have a dockercompose
-#@arg1=$i
+#Check if the directory have a docker-compose and depend of arg1 up or down the doker-compose
+#@arg1=$1
+#@arg2=$list
 check_compose(){
-	if [ -f $1/docker_compose.yml ]
-	then 
-		statement_up_down $1 $i
-	else
-		echo "The directory: $i doesn't have docker_compose"
-	fi
-	
-}
+	for i in ${list[@]}
+	do
+		cd $i
+		if [[ $(find . -name 'docker-compose.yml' | wc -l) -gt 0 ]]
+		then
+			{
+				docker-compose $1 -d
+			}|| echo "Error with the docker-compose"
+		else
+			echo "The directory: $i doesn't have docker-compose"
+		fi
 
-#Check if is up or down and run the correct command
-#arg=$1 <-- up or down
-#arg=i <-- the directory name
-statement_up_down(){
-	if [ "$1" == "up" ]
-	then
-		cd $i
-		{
-			docker-compose up
-		}||
-		{
-			echo "Fallo en docker compose"
-		}
-		cd ..
-	else
-		cd $i
-		{
-			docker-compose down
-		}||
-		{
-			echo "Fallo en docker compose"
-		}
-		cd ..
-	fi
+		cd .. 
+	done
+	
 }
 
 #################################################
@@ -128,9 +109,6 @@ statement_up_down(){
 #################################################
 
 case $1 in
-	--prueba)
-		prueba
-		;;
 	--help)
 		help
 		;;
